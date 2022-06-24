@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx:alpine 
+        imagePullPolicy: Always
+        name: nginx
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        volumeMounts:
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/conf.d
+        - name: secret-volume
+          mountPath: /etc/nginx/ssl
+        - name: nginx-index-volume
+          mountPath: /usr/share/nginx/html
+      # Load the configuration files for nginx
+      volumes:
+        - name: nginx-config-volume
+          configMap:
+            name: nginx-config
+        - name: secret-volume
+          secret:
+            secretName: ssl-certs
+        - name: nginx-index-volume
+          configMap:
+            name: nginx-html
